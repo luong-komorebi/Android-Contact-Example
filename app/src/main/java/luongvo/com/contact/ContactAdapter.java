@@ -1,13 +1,18 @@
 package luongvo.com.contact;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +34,9 @@ class ContactAdapter extends ArrayAdapter<Contact> {
         this.context = context;
     }
 
+
+
+
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -47,7 +55,7 @@ class ContactAdapter extends ArrayAdapter<Contact> {
                 public void onClick(View v) {
                     Uri number = Uri.parse("tel:" + getItem(position).phoneNumber);
                     Intent callIntent = new Intent(Intent.ACTION_CALL, number);
-                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    /*if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
                         // here to request the missing permissions, and then overriding
@@ -56,7 +64,7 @@ class ContactAdapter extends ArrayAdapter<Contact> {
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
                         return;
-                    }
+                    }*/
                     context.startActivity(callIntent);
                 }
             });
@@ -65,7 +73,9 @@ class ContactAdapter extends ArrayAdapter<Contact> {
                 @Override
                 public void onClick(View v) {
                     Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-                    smsIntent.setType("vnd.android-dir/mms-sms");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        smsIntent.setData(Uri.parse("sms:"));
+                    else smsIntent.setType("vnd.android-dir/mms-sms");
                     smsIntent.putExtra("sms_body", "Hi " + getItem(position).name);
                     smsIntent.putExtra("address", getItem(position).phoneNumber);
                     context.startActivity(smsIntent);
